@@ -1,5 +1,5 @@
 # from .user_dao  import UserDao
-from .event_dao import EventDao
+from .data_access import EventDao
 
 __all__ = [ 
     'UserDao',

@@ -18,10 +18,15 @@ def populate_tables(connection):
     """ Populates audit-log database tables """
     c = connection.cursor()
 
-    events_data=[
+    events_data = [
         (str(uuid.uuid4()),"2922-02-30",1,1,1),
         (str(uuid.uuid4()),"2002-07-31",2,2,2),
         ]
+
+    user_data = [
+        ("iamuser1",str(uuid.uuid4()),'pass123',True,1),
+        ("iamuser2",str(uuid.uuid4()),'pass123',True,1),
+    ]
 
     """ table EVENTS """
     c.executemany("""INSERT INTO events(
@@ -45,16 +50,14 @@ def populate_tables(connection):
                 )
                 VALUES("user"),("resource");""")
 
-    c.execute("""INSERT INTO users(
+    c.executemany("""INSERT INTO users(
                 username,
                 uuid,
                 password,
                 is_active,
                 entity_id
                 )
-                VALUES(
-                    "jojo","23fialifj","pass1234",True,1
-                );""")
+                VALUES(?,?,?,?,?);""",user_data)
 
     c.execute("""INSERT INTO resources(
                 price,
