@@ -1,5 +1,4 @@
 import json
-from multiprocessing import Event
 import sqlite3
 from flask import (
     Flask,
@@ -8,7 +7,7 @@ from flask import (
 )
 
 import config
-from model import EventDao
+from model.data_access import EventDao,EntityDao, EventtypeDao, ResourceDao, UserDao
 from view import * 
 from service import *
 
@@ -20,7 +19,10 @@ app.debug = True
 # only GET methods take query parameter, rest is json
 
 event_dao = EventDao()
-
+# user_dao = UserDao()
+# type_dao = EventtypeDao()
+# entity_dao = EntityDao()
+# resource_dao = ResourceDao()
 
 
 @app.route("/search", methods=['GET']) 
@@ -66,14 +68,13 @@ def post_event_log():
     # request.get_json returns python dict in body of request
     content = request.get_json()
 
-    user_id = content["user"]
-    type_id = content["eventType"]
-    entity_id= content["entity"]
+    user = content["user"] # "jojo"
+    type = content["eventType"] # "UPDATE"
+    entity= content["entity"] # "resource"
 
-    """what if they send unregosnized field?"""
-    event_dao.post_event(user=user_id,type=type_id,entity=entity_id)
-
-
+    # user_dao.post_user(user=user)
+    # user = user_dao.get_user(user) # returns rowid
+    event_dao.post_event(user=user,type=type,entity=entity)
     return jsonify("success"),201
 
 

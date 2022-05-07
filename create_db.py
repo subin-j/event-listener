@@ -39,7 +39,6 @@ def create_tables(connection):
     c.execute("""CREATE TABLE IF NOT EXISTS users(
                 username text NOT NULL UNIQUE,
                 uuid text NOT NULL UNIQUE,
-                password text NOT NULL,
                 is_active bool NOT NULL,
                 entity_id int NOT NULL,
                 FOREIGN KEY(entity_id) REFERENCES entities(rowid)
