@@ -53,11 +53,10 @@ def populate_tables(connection):
     c.executemany("""INSERT INTO users(
                 username,
                 uuid,
-                password,
                 is_active,
                 entity_id
                 )
-                VALUES(?,?,?,?,?);""",user_data)
+                VALUES(?,?,?,?);""",user_data)
 
     c.execute("""INSERT INTO resources(
                 price,

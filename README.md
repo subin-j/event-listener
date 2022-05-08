@@ -1,96 +1,110 @@
-Auditor Microservice
+# Auditor Microservice
 
 
-# Description
-Auditor Microservice listens to set of events from other system, with ability to store and retrieve such events data.
-For convinience we assume that the system is a basic billing service.
+## Description
+Auditor Microservice listens to set of events from other system, with ability to store and retrieve such events data.\
+For convinience we assume that the system is a basic CRUD web service.\
 Examples of events to be recorded:
 
 - a new customer account was created for a given identity
-- a customer performed an action on a resource
-- a customer was billed a certain amount
-- a customer account was deactivated
+- a user performed an action on a resource
+- a user was deactivated
 
 
-# Initial design decisions
-To make Auditor Microservice runs on HTTP server and provides HTTP endpoint efficiently, this project was built with Python micro web framework Flask and Sqlite3 as a data storage mechanism.
+## Initial design decisions
+To make Auditor Microservice runs on HTTP server and provides HTTP endpoint efficiently, this project was built with Python micro web framework Flask and Sqlite3 as a data storage mechanism.\
 Note that this project only utilizes the bare minimum of Flask mainly for routing and running HTTP server.
 
-Audit logs should be generated whenever there is a meaningful change to database of host system. Auditor Microservice would be listening to changes coming to the system, and interpret:
+Audit logs should be generated whenever there is a meaningful change to database of host system.\
+Auditor Microservice would be listening to changes coming to the system, and interpret:
 
-1.what entity was changed?  ex) customer.updated or event.updated
-2.what was the type of event? ex) among CRUD
-3.When was the event happened? ex) 2022-20-04 GMT 12:00 (10 min ago)
-4.By Who? ex) customer id with name 
+1. what entity was changed?  
+2. what was the type of event? 
+3. When was the event happened? 
+4. By Who?
 
-Before commiting writing code I have decided to imagine what would request and response look like.
+Before commiting to write code I have decided to imagine what would request and response look like.\
 In their raw form, they will look something like below:
+### `http method = GET `
+#### request
 
-<request json example >
-payload =
-    {
-    entity : CustomerData
-    datetime: 2022-02-02,
-    event_type: CREATE
-    
+    payload =
+        {
+        # query strings of choice
+        user: username
+        entity : resource
+        event_type: CREATE
+        }
+
+#### response
+
+    response=
+        {
+            user: username
+            target entity: resource
+            property: name
+            event_uuid : qrwr2014a9sfahalwf2840
+            event_type: UPDATE
+            datetime: 2022-04-02 GMT 12:00
+        }
+
+        log(" user {username} performed {event_type} on {property} in{entity} at{datetime} " ,200)
+
+
+
+
+### `http method = POST`
+#### request
+    payload ={
+        user: username
+        entity : resource
+        event_type: CREATE
     }
 
-<response json example >
-sucess response=
-    {
-        result: success
-        entity: CustomerData
-        property: name
-        event_uuid : qrwr2014a9sfahalwf2840
-        event_type: UPDATE
-        datetime: 2022-04-02 GMT 12:00
-        customer: 073 SUBIN JEONG ,125.22.33.22
-    }
+#### response
 
-failed response=
-    {
-        result: failed
-        reason: does not exist
-    }
+    log(success, 201)
+
+
 
 Auditor API and does not provide a full front-end feature.
 It will provide response in basic JSON format to given requests.
 
 
-# Deployment (Ubuntu)
-
-# Testing
-send curl request with very specific json strings to simulate the system's requests.
-
-- Ping
-curl -X GET localhost:5000/ping
-
-- GET
-curl -X GET localhost:5000/get_log/customer/<user_id>
+## Deployment (Ubuntu)
+- to be written
 
 
-curl -X GET localhost:5000/get_log/event/<event_id>
+## Testing
+send curl request with prepared json strings to simulate incoming requests.
 
-- POST
-curl -X POST {key:value} localhost:5000/create_log/<user_id>
-curl -X POST localhost:5000/create_log/<event_id>
-
-- PUT
-curl -X PUT localhost:5000/update_log/<user_id>
-curl -X PUT localhost:5000/update_log/<event_id>
-
-- DELETE
+`GET`\
+    querying is possible by different field values
+  - by user 
+  - by datetime
+  - by eventtype
+  - by entity
 
 
+get all event logs
+```bash
+$curl --location --request GET 'localhost:5000/search' \
+--header 'Content-Type: application/json'
+```
 
+get filtered log/logs
+```bash
+$curl --location --request GET 'localhost:5000/search?by-user=username&by-datetime=DD-MM-YY&by-event-type=update&by-target-entity=resource'' \
+--header 'Content-Type: application/json'
+```
 
-Querying by different field values
-- by User 
-- by datetime
-- by 
-
-
-
-
-
-
+`POST`
+```
+$curl --location --request POST 'http://127.0.0.1:5000/' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "user": "jojo",
+    "eventType": 2,
+    "entity": 1
+}'
+```
