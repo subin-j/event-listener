@@ -4,11 +4,6 @@
 ## Description
 Auditor Microservice listens to set of events from other system, with ability to store and retrieve such events data.\
 For convinience we assume that the system is a basic CRUD web service.\
-Examples of events to be recorded:
-
-- a new customer account was created for a given identity
-- a user performed an action on a resource
-- a user was deactivated
 
 
 ## Initial design decisions
@@ -18,54 +13,51 @@ Note that this project only utilizes the bare minimum of Flask mainly for routin
 Audit logs should be generated whenever there is a meaningful change to database of host system.\
 Auditor Microservice would be listening to changes coming to the system, and interpret:
 
-1. what entity was changed?  
-2. what was the type of event? 
-3. When was the event happened? 
-4. By Who?
+1. what entity was changed?  -> resource, account ...
+2. what was the type of event? -> UPDATE, DELETE ...
+3. When was the event happened? - 2022-01-01 2:00 GTM 
+4. By Who? -> username
 
 Before commiting to write code I have decided to imagine what would request and response look like.\
 In their raw form, they will look something like below:
+
 ### `http method = GET `
 #### request
 
-    payload =
+    get_me_logs_with_this_values =
         {
-        # query strings of choice
-        user: username
-        entity : resource
-        event_type: CREATE
+        # query of choice, can be multiple
+        username: jojo
         }
 
 #### response
 
     response=
         {
-            user: username
-            target entity: resource
-            property: name
-            event_uuid : qrwr2014a9sfahalwf2840
-            event_type: UPDATE
+            user =[
+                {username: jojo}
+                {user-uuid: iwjfak2hl1jaslf-alwejflasjd}
+            ]
+            target-entity: resource
+            event-uuid : qrwr2014a9-sfahalwf2840
+            event-type: CREATE
             datetime: 2022-04-02 GMT 12:00
         }
 
-        log(" user {username} performed {event_type} on {property} in{entity} at{datetime} " ,200)
-
+        log(" user {username, user-uuid} performed {event-type} on {target-entity}  at{datetime} " ,200)
 
 
 
 ### `http method = POST`
 #### request
     payload ={
-        user: username
-        entity : resource
-        event_type: CREATE
+        username: username
+        target-entity: resource
+        event-type: CREATE
     }
 
 #### response
-
     log(success, 201)
-
-
 
 Auditor API and does not provide a full front-end feature.
 It will provide response in basic JSON format to given requests.
@@ -85,26 +77,29 @@ send curl request with prepared json strings to simulate incoming requests.
   - by eventtype
   - by entity
 
-
-get all event logs
+keys: user, datetime, event-type, target-entity
+if there are no key:value given, it will get all rows
 ```bash
 $curl --location --request GET 'localhost:5000/search' \
---header 'Content-Type: application/json'
-```
-
-get filtered log/logs
-```bash
-$curl --location --request GET 'localhost:5000/search?by-user=username&by-datetime=DD-MM-YY&by-event-type=update&by-target-entity=resource'' \
---header 'Content-Type: application/json'
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "username":"jojo",
+    "datetime":"2002-07-31",
+    "event-type":"UPDATE",
+    "target-entity":"resource"
+}'
 ```
 
 `POST`
+
+fixed keys: username, event-type, target-entity
+if not all key:values are provided, it will log error
 ```
 $curl --location --request POST 'http://127.0.0.1:5000/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "user": "jojo",
-    "eventType": 2,
-    "entity": 1
+    "username": "jojo",
+    "event-type": "UPDATE",
+    "target-entity": "resource"
 }'
 ```

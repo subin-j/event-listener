@@ -7,7 +7,7 @@ from flask import (
 )
 
 import config
-from model.data_access import EventDao,EntityDao, EventtypeDao, ResourceDao, UserDao
+from model import dao
 from view import * 
 from service import *
 
@@ -16,9 +16,9 @@ app.debug = True
 
 
 # service layers-------------------------------
-# only GET methods take query parameter, rest is json
+# all method takes json as data
 
-event_dao = EventDao()
+event_dao = dao.EventDao()
 # user_dao = UserDao()
 # type_dao = EventtypeDao()
 # entity_dao = EntityDao()
@@ -27,56 +27,35 @@ event_dao = EventDao()
 
 @app.route("/search", methods=['GET']) 
 def get_event_log():
-    # get methods: default/ by user uuid/ by event type/ by target entity
-    # chain multiple filters
-    query = request.args.to_dict()
+    payload = request.get_json() #{key:val}
 
-    by_user = query.get("by-user",None)
-    by_datetime=query.get("by-datetime",None) #ascending and decending options
-    by_event_type=query.get("by-event-type",None)
-    by_target_entity=query.get("by-target-entity",None)
-
-    if by_user:
-        user = by_user
-        # search by uuid or username.
-        """SELECT * from Events WHERE (user_id = user_uuid)"""
-        pass
-
-    if by_datetime:
-        datetime = by_datetime
-        pass
-        """ SELECT * from events by (?), (order)"""
+    by_user = payload.get("username",None)
+    by_datetime = payload.get("datetime",None) #ascending and decending options
+    by_type = payload.get("event-type",None)
+    by_entity = payload.get("target-entity",None)
     
-    if by_event_type:
-        event_type = by_event_type
-        """ SELECT * from events WHERE (event_type = event_type) """
-        pass
+    filters = {
+        "user_id": by_user,
+        "created_at": by_datetime,
+        "type_id": by_type,
+        "entity_id": by_entity
+    }
 
-    if by_target_entity:
-        pass
-    
-    result = event_dao.get_all_events()
-    # connection.commit()
-    # c.close()
-
-    print(result)
-    return jsonify("query result: ",result,200)
+    result = event_dao.get_filtered_event(filters)
+    return jsonify("result: ",result,200)
 
 
 @app.route("/", methods=['POST'])
 def post_event_log():
     # request.get_json returns python dict in body of request
-    content = request.get_json()
+    payload = request.get_json()
 
-    user = content["user"] # "jojo"
-    type = content["eventType"] # "UPDATE"
-    entity= content["entity"] # "resource"
+    user = payload["user"] # "jojo"
+    type = payload["eventType"] # "UPDATE"
+    entity= payload["entity"] # "resource"
 
-    # user_dao.post_user(user=user)
-    # user = user_dao.get_user(user) # returns rowid
     event_dao.post_event(user=user,type=type,entity=entity)
-    return jsonify("success"),201
-
+    return jsonify("success",201)
 
 
 if __name__ == "__main__":

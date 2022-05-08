@@ -24,8 +24,8 @@ def populate_tables(connection):
         ]
 
     user_data = [
-        ("iamuser1",str(uuid.uuid4()),'pass123',True,1),
-        ("iamuser2",str(uuid.uuid4()),'pass123',True,1),
+        ("iamuser1",str(uuid.uuid4()),True,1),
+        ("iamuser2",str(uuid.uuid4()),True,1),
     ]
 
     """ table EVENTS """
