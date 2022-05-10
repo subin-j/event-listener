@@ -1,3 +1,4 @@
+from html import entities
 import sqlite3
 import uuid
 from datetime import datetime
@@ -19,14 +20,24 @@ def populate_tables(connection):
     c = connection.cursor()
 
     events_data = [
-        (str(uuid.uuid4()),"2922-02-30",1,1,1),
-        (str(uuid.uuid4()),"2002-07-31",2,2,2),
+        (str(uuid.uuid4()),datetime.now().strftime("%d-%m-%Y"),1,1,1),
+        (str(uuid.uuid4()),"13-02-2022",2,1,1),
+        (str(uuid.uuid4()),"27-05-2022",3,1,1),
         ]
 
+    # eventtypes_data =[
+    #     "CREATE","UPDATE"
+    # ]
+
     user_data = [
-        ("iamuser1",str(uuid.uuid4()),True,1),
-        ("iamuser2",str(uuid.uuid4()),True,1),
+        ("username_1",str(uuid.uuid4()),True),
+        ("username_2",str(uuid.uuid4()),True),
+        ("username_3",str(uuid.uuid4()),False),
     ]
+
+    # entities_data =[
+    #     ("resource"),
+    # ]
 
     """ table EVENTS """
     c.executemany("""INSERT INTO events(
@@ -35,8 +46,7 @@ def populate_tables(connection):
                 user_id,
                 type_id,
                 entity_id)
-                VALUES(?,?,?,?,?)
-                ;""",events_data)
+                VALUES(?,?,?,?,?);""",events_data)
 
     """ table EVENTTYPES """
     c.execute("""INSERT INTO eventtypes(
@@ -46,26 +56,16 @@ def populate_tables(connection):
 
     """ table ENTITIES """
     c.execute("""INSERT INTO entities(
-                name        
+                entity
                 )
-                VALUES("user"),("resource");""")
+                VALUES("resource"),("account");""")
 
     c.executemany("""INSERT INTO users(
                 username,
-                uuid,
-                is_active,
-                entity_id
+                user_uuid,
+                is_active
                 )
-                VALUES(?,?,?,?);""",user_data)
-
-    c.execute("""INSERT INTO resources(
-                price,
-                entity_id
-                )
-                VALUES(
-                    30.5,
-                    1
-                );""")
+                VALUES(?,?,?);""",user_data)
 
     connection.commit()
     connection.close()

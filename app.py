@@ -22,39 +22,41 @@ event_dao = dao.EventDao()
 # user_dao = UserDao()
 # type_dao = EventtypeDao()
 # entity_dao = EntityDao()
-# resource_dao = ResourceDao()
 
 
 @app.route("/search", methods=['GET']) 
 def get_event_log():
-    payload = request.get_json() #{key:val}
+    # try:
+    payload = request.get_json()
 
     by_user = payload.get("username",None)
     by_datetime = payload.get("datetime",None) #ascending and decending options
     by_type = payload.get("event-type",None)
     by_entity = payload.get("target-entity",None)
     
-    filters = {
-        "user_id": by_user,
-        "created_at": by_datetime,
-        "type_id": by_type,
-        "entity_id": by_entity
+    query_param = {
+        "username": by_user,
+        "datetime": by_datetime,
+        "event-type": by_type,
+        "target-entity": by_entity
     }
 
-    result = event_dao.get_filtered_event(filters)
+    result = event_dao.get_events(query_param)
     return jsonify("result: ",result,200)
+
+    # except Exception as e:
+    #     return {'message': 'JSON_DECODE_ERROR'}
 
 
 @app.route("/", methods=['POST'])
 def post_event_log():
-    # request.get_json returns python dict in body of request
     payload = request.get_json()
 
-    user = payload["user"] # "jojo"
-    type = payload["eventType"] # "UPDATE"
-    entity= payload["entity"] # "resource"
-
-    event_dao.post_event(user=user,type=type,entity=entity)
+    event_dao.post_event(
+        username=payload.get("username"),
+        type=payload.get("event-type"),
+        entity=payload.get("target-entity"),
+        )
     return jsonify("success",201)
 
 
