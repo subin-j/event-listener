@@ -1,24 +1,22 @@
+from functools import wraps
+
 from flask import (
     Flask,
     request,
     jsonify,
 )
 import jwt
-from functools import wraps
 
 from config import JWT_KEY, ALGORITHM, API_KEY
 from model import dao
-from view import * 
 
 app = Flask(__name__)
-app.debug = True
 
-
-# service layers-------------------------------
 event_dao = dao.EventDao()
 
 
 def authorization_required(func):
+    """ Decorator function for endpoint authorization."""
     @wraps(func)
     def wrapper (*args, **kwargs):
         token = request.headers['Token']
@@ -36,7 +34,7 @@ def authorization_required(func):
 @app.route("/search", methods=['GET']) 
 @authorization_required
 def get_event_log():
-
+    """ Endpoint for querying data in Events table. """
     try:
         payload = request.get_json()
         if payload == {} :
@@ -63,6 +61,7 @@ def get_event_log():
 @app.route("/", methods=['POST'])
 @authorization_required
 def post_event_log():
+    """ Endpoint for querying data in Events table. """
     try:
         payload = request.get_json()
         event_dao.post_event(
@@ -73,6 +72,8 @@ def post_event_log():
         return jsonify("success",201)
     except Exception:
         return {'message': 'JSON_DECODE_ERROR'}
+
+
 
 
 if __name__ == "__main__":
