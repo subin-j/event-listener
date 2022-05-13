@@ -33,22 +33,19 @@ def create_tables(connection):
                 );""")
 
     c.execute("""CREATE TABLE IF NOT EXISTS entities(
-                name text NOT NULL UNIQUE
+                entity text NOT NULL UNIQUE
                 );""")
 
     c.execute("""CREATE TABLE IF NOT EXISTS users(
                 username text NOT NULL UNIQUE,
-                uuid text NOT NULL UNIQUE,
-                is_active bool NOT NULL,
-                entity_id int NOT NULL,
-                FOREIGN KEY(entity_id) REFERENCES entities(rowid)
+                user_uuid text NOT NULL UNIQUE,
+                is_active bool NOT NULL
                 );""")
 
-    c.execute("""CREATE TABLE IF NOT EXISTS resources(
-                price FLOAT NOT NULL,
-                entity_id int NOT NULL,
-                FOREIGN KEY(entity_id) REFERENCES entities(rowid)
-                );""")
+    # c.execute("""CREATE TABLE IF NOT EXISTS resources(
+    #             price FLOAT NOT NULL,
+    #             FOREIGN KEY(entity_id) REFERENCES entities(rowid)
+    #             );""")
 
     connection.commit()
     connection.close()
