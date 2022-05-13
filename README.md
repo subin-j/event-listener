@@ -3,7 +3,7 @@
 
 ## Description
 Auditor Microservice listens to set of events from other system, with ability to store and retrieve such events data.\
-For convinience we assume that the system is a basic CRUD web service.\
+For convinience we assume that the system is a basic CRUD web service.
 
 
 ## Initial design decisions
@@ -22,44 +22,45 @@ Before commiting to write code I have decided to imagine what would request and 
 In their raw form, they will look something like below:
 
 ### `http method = GET `
-#### request
+#### `request` 
 
+```python
     get_me_logs_with_this_values =
         {
         # query of choice, can be multiple
-        username: jojo
+        "username": "jojo"
         }
-
-#### response
-
-    response=
+```
+#### `response` will return all data containing the given field value.
+```python
+    [response=
         {
-            user =[
-                {username: jojo}
-                {user-uuid: iwjfak2hl1jaslf-alwejflasjd}
-            ]
-            target-entity: resource
-            event-uuid : qrwr2014a9-sfahalwf2840
-            event-type: CREATE
-            datetime: 2022-04-02 GMT 12:00
+            "username": "jojo"}
+            "target-entity": "resource"
+            "event-uuid" : "qrwr2014a9-sfahalwf2840"
+            "event-type": "CREATE"
+            "datetime": "2022-04-02
         }
 
-        log(" user {username, user-uuid} performed {event-type} on {target-entity}  at{datetime} " ,200)
-
+    ("SUCCESS" ,200)]
+```
 
 
 ### `http method = POST`
-#### request
+#### `request`
+```python
     payload ={
-        username: username
-        target-entity: resource
-        event-type: CREATE
+        "username": "jojo"
+        "target-entity": "resource"
+        "event-type": "CREATE"
     }
+```
+#### `response`
+```python
+    [(success, 201)]
+```
 
-#### response
-    log(success, 201)
-
-Auditor API and does not provide a full front-end feature.
+Auditor API and does not provide a front-end feature.
 It will provide response in basic JSON format to given requests.
 
 
@@ -68,20 +69,22 @@ It will provide response in basic JSON format to given requests.
 
 
 ## Testing
-send curl request with prepared json strings to simulate incoming requests.
+Send curl request with prepared json strings to simulate incoming requests.
+
+contents of **--data-raw** can be modified.
+Make sure to include the token in header as written, this API does not provide login endpoint. 
 
 `GET`\
-    querying is possible by different field values
-  - by user 
-  - by datetime
-  - by eventtype
-  - by entity
+    querying is possible by different field values, it will return the intersection.
 
-keys: user, datetime, event-type, target-entity
-if there are no key:value given, it will get all rows
+    keys: username, datetime, event-type, target-entity.
+
+    if there are no key:value given, it will get all rows.
+
 ```bash
 $curl --location --request GET 'localhost:5000/search' \
 --header 'Content-Type: application/json' \
+--header 'Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5Ijoic3VwZXJfc2VjcmV0ZV9hcGlfa2V5In0.3JG2tIV1pfrDLgXnO0e6mDsyjmQe9ZkKmhXxkhtKtE8' \
 --data-raw '{
     "username":"jojo",
     "datetime":"2002-07-31",
@@ -94,9 +97,10 @@ $curl --location --request GET 'localhost:5000/search' \
 
 fixed keys: username, event-type, target-entity
 if not all key:values are provided, it will log error
-```
+```bash
 $curl --location --request POST 'http://127.0.0.1:5000/' \
 --header 'Content-Type: application/json' \
+--header 'Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5Ijoic3VwZXJfc2VjcmV0ZV9hcGlfa2V5In0.3JG2tIV1pfrDLgXnO0e6mDsyjmQe9ZkKmhXxkhtKtE8' \
 --data-raw '{
     "username": "jojo",
     "event-type": "UPDATE",
