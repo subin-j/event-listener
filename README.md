@@ -82,14 +82,15 @@ Make sure to include the token in header as written, this API does not provide l
     if there are no key:value given, it will get all rows.
 
 ```bash
-$curl --location --request GET 'localhost:5000/search' \
---header 'Content-Type: application/json' \
---header 'Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5Ijoic3VwZXJfc2VjcmV0ZV9hcGlfa2V5In0.3JG2tIV1pfrDLgXnO0e6mDsyjmQe9ZkKmhXxkhtKtE8' \
+$curl -L -X GET 'localhost:5000/search' \
+-H 'Content-Type: application/json' \
+-H 'Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5Ijoic3VwZXJfc2VjcmV0ZV9hcGlfa2V5In0.3JG2tIV1pfrDLgXnO0e6mDsyjmQe9ZkKmhXxkhtKtE8' \
 --data-raw '{
-    "username":"jojo",
-    "datetime":"2002-07-31",
-    "event-type":"UPDATE",
-    "target-entity":"resource"
+    "username" : "jojo",
+    "event-type": "CREATE",
+    "datetime": "13-05-2022",
+    "target-entity": "resource"
+
 }'
 ```
 
@@ -98,12 +99,12 @@ $curl --location --request GET 'localhost:5000/search' \
 fixed keys: username, event-type, target-entity
 if not all key:values are provided, it will log error
 ```bash
-$curl --location --request POST 'http://127.0.0.1:5000/' \
---header 'Content-Type: application/json' \
---header 'Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5Ijoic3VwZXJfc2VjcmV0ZV9hcGlfa2V5In0.3JG2tIV1pfrDLgXnO0e6mDsyjmQe9ZkKmhXxkhtKtE8' \
+$curl -L -X POST 'http://127.0.0.1:5000/' \
+-H 'Content-Type: application/json' \
+-H 'Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5Ijoic3VwZXJfc2VjcmV0ZV9hcGlfa2V5In0.3JG2tIV1pfrDLgXnO0e6mDsyjmQe9ZkKmhXxkhtKtE8' \
 --data-raw '{
-    "username": "jojo",
-    "event-type": "UPDATE",
-    "target-entity": "resource"
+    "username": "hello",
+    "event-type": "NEW_EVENT_TYPE",
+    "target-entity":"new_entity"
 }'
 ```

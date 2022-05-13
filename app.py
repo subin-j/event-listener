@@ -1,34 +1,15 @@
-from functools import wraps
-
 from flask import (
     Flask,
     request,
     jsonify,
 )
-import jwt
 
 from config import JWT_KEY, ALGORITHM, API_KEY
+from utils.decorators import authorization_required
 from model import dao
 
 app = Flask(__name__)
-
 event_dao = dao.EventDao()
-
-
-def authorization_required(func):
-    """ Decorator function for endpoint authorization."""
-    @wraps(func)
-    def wrapper (*args, **kwargs):
-        token = request.headers['Token']
-        if not token:
-            return jsonify({"messege" : "Missing token."}), 403
-
-        decoded_token = jwt.decode(token, JWT_KEY, ALGORITHM)
-        if not decoded_token["api_key"] == API_KEY:
-            return jsonify({"messege" : "Invalid token."}), 403
-
-        return func(*args, **kwargs)
-    return wrapper
 
 
 @app.route("/search", methods=['GET']) 
@@ -72,8 +53,6 @@ def post_event_log():
         return jsonify("success",201)
     except Exception:
         return {'message': 'JSON_DECODE_ERROR'}
-
-
 
 
 if __name__ == "__main__":
