@@ -22,22 +22,15 @@ def populate_tables(connection):
     events_data = [
         (str(uuid.uuid4()),datetime.now().strftime("%d-%m-%Y"),1,1,1),
         (str(uuid.uuid4()),"13-02-2022",2,1,1),
-        (str(uuid.uuid4()),"27-05-2022",3,1,1),
+        (str(uuid.uuid4()),"02-05-2022",3,1,1),
         ]
 
-    # eventtypes_data =[
-    #     "CREATE","UPDATE"
-    # ]
-
     user_data = [
-        ("username_1",str(uuid.uuid4()),True),
-        ("username_2",str(uuid.uuid4()),True),
-        ("username_3",str(uuid.uuid4()),False),
+        ("jojo",str(uuid.uuid4()),True),
+        ("subin",str(uuid.uuid4()),True),
+        ("canonical",str(uuid.uuid4()),True),
+        ("pythonlover",str(uuid.uuid4()),False),
     ]
-
-    # entities_data =[
-    #     ("resource"),
-    # ]
 
     """ table EVENTS """
     c.executemany("""INSERT INTO events(
