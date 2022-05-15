@@ -21,7 +21,9 @@ Auditor Microservice would be listening to changes coming to the system, and int
 Before commiting to write code I have decided to imagine what would request and response look like.\
 In their raw form, they will look something like below:
 
-### `http method = GET `
+### Examples of expected responses of GET and POST request.
+
+#### `<http method = GET>`
 #### `request` 
 
 ```python
@@ -46,7 +48,7 @@ In their raw form, they will look something like below:
 ```
 
 
-### `http method = POST`
+#### `<http method = POST>`
 #### `request`
 ```python
     payload ={
@@ -60,44 +62,40 @@ In their raw form, they will look something like below:
     [(success, 201)]
 ```
 
+This project does not use any ORM and querying is done by manipulating pure SQL commands through python functions.
+
+To achieve flexibility of querying, functions responsible for SQL commands are designed to be reusable with any entities or fields. They accept placeholder strings as parameter. 
+
+
 Auditor API and does not provide a front-end feature.
 It will provide response in basic JSON format to given requests.
 
 
 ## Deployment (Ubuntu)
-- to be written
+- Clone the repository to your local machine. 
+- Run `$bash deploy_locally.sh`
+  - if above doesn't run properly, first make it executable by running command `$chmod -x deploy_locally.sh`
+- The bash script will install python environment and dependancies and run the http server.
+- Read testing instructions below and try some curl commands.
 
 
 ## Testing
 Send curl request with prepared json strings to simulate incoming requests.
 
-contents of **--data-raw** can be modified.
-Make sure to include the token in header as written, this API does not provide login endpoint. 
+Only the contents of **--data-raw** can be modified.
+Make sure to include the token in header as written, this API does not provide login endpoint.
 
-`GET`\
-    querying is possible by different field values, it will return the intersection.
+<div>
 
-    keys: username, datetime, event-type, target-entity.
+Sending `POST` request to log new data.
 
-    if there are no key:value given, it will get all rows.
+    Fixed keys: username, event-type, target-entity
 
-```bash
-$curl -L -X GET 'localhost:5000/search' \
--H 'Content-Type: application/json' \
--H 'Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5Ijoic3VwZXJfc2VjcmV0ZV9hcGlfa2V5In0.3JG2tIV1pfrDLgXnO0e6mDsyjmQe9ZkKmhXxkhtKtE8' \
---data-raw '{
-    "username" : "jojo",
-    "event-type": "CREATE",
-    "datetime": "13-05-2022",
-    "target-entity": "resource"
+    if not all key:values are provided, it will log error.
 
-}'
-```
+    All key fields accept unknown/new values and get stored it as string literals.
 
-`POST`
 
-fixed keys: username, event-type, target-entity
-if not all key:values are provided, it will log error
 ```bash
 $curl -L -X POST 'http://127.0.0.1:5000/' \
 -H 'Content-Type: application/json' \
@@ -108,3 +106,30 @@ $curl -L -X POST 'http://127.0.0.1:5000/' \
     "target-entity":"new_entity"
 }'
 ```
+<div>
+
+Sending `GET` request to get stored data.
+
+    Fixed keys: username, datetime, event-type, target-entity
+
+    Querying is possible by four different field values, it will return the intersection.
+
+    Each key can be removed or added as pleased. Result will be intersections of given keys.
+
+    If there are no key:value given, by default it will get all rows.
+
+    Datetime format is dd-mm-yy.
+
+```bash
+$curl -L -X GET 'localhost:5000/search' \
+-H 'Content-Type: application/json' \
+-H 'Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5Ijoic3VwZXJfc2VjcmV0ZV9hcGlfa2V5In0.3JG2tIV1pfrDLgXnO0e6mDsyjmQe9ZkKmhXxkhtKtE8' \
+--data-raw '{
+    "username" : "subin",
+    "event-type": "CREATE",
+    "datetime": "13-02-2022",
+    "target-entity": "resource"
+
+}'
+```
+
